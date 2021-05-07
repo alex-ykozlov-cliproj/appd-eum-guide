@@ -1,0 +1,91 @@
+<html>
+  <head>
+    <!-- if you run as a local file, duse Firefox and disable CORS:
+    - Install https://addons.mozilla.org/en-US/firefox/addon/cors-everywhere/ add On
+    - Click on the newly added Cors E icon on next to niv bar. It will turn green
+    - Use the page. Turn off Cord E after done.
+    -->
+    <script>
+      function extractUserData() {
+          return {
+            userData: {
+              key_dtTimestamp: document.getElementById("dtTimestamp").value
+            }
+          };
+      }
+    </script>
+    <script charset="UTF-8" type="text/javascript">
+      window["adrum-start-time"] = new Date().getTime();
+      (function(config){
+          (function (info) {
+              info.PageView = extractUserData;
+
+              info.VPageView = extractUserData;
+              
+              info.Ajax = function(context) {
+                return {
+                  userPageName: "Step2 - Ajax",                  
+                  userData: {
+                    key_dtTimestamp: document.getElementById("dtTimestamp").value
+                  }
+                }
+            };            
+          })(config.userEventInfo || (config.userEventInfo = {}));
+          
+          config.appKey = "AD-AAB-ABB-TXJ";
+          config.adrumExtUrlHttp = "http://cdn.appdynamics.com";
+          config.adrumExtUrlHttps = "https://cdn.appdynamics.com";
+          config.beaconUrlHttp = "http://pdx-col.eum-appdynamics.com";
+          config.beaconUrlHttps = "https://pdx-col.eum-appdynamics.com";
+          config.resTiming = {"bufSize":200,"clearResTimingOnBeaconSend":true};
+          config.maxUrlLength = 512;
+          config.xd = {enable : false};
+          config.spa = {
+              "spa2": true
+          };        
+      })(window["adrum-config"] || (window["adrum-config"] = {}));
+      </script>
+      <script src="http://cdn.appdynamics.com/adrum/adrum-latest.js"></script>
+
+    <script>
+      function StepVPage( n ) {
+        ADRUM.markVirtualPageBegin("Step "+n, false);
+        alert("StepVPage ["+n+"] : "+document.getElementById("dtTimestamp").value);
+        ADRUM.markVirtualPageEnd();
+      }
+
+      function StepAjax( n ) {
+        alert("StepAjax ["+n+"] : "+document.getElementById("dtTimestamp").value);
+        var request = new XMLHttpRequest();
+        request.open("GET", "https://www.google.com/search?q=ajax");
+        request.onreadystatechange = function() {
+          if(this.readyState === 4 && this.status === 200) {
+              document.getElementById("ajaxResult").innerHTML = this.responseText;
+          }
+        }
+        request.send();
+      }
+
+      function onLoad() {
+        updateTimeField();
+      }
+
+      function updateTimeField() {
+        var dt = new Date();
+        document.getElementById("dtTimestamp").value = dt;//.toISOString();
+      }
+    </script>
+  </head>
+  <body onload="onLoad()">
+      Timestamp: <input type="datetime-local" id="dtTimestamp">
+      <input type="button" value="Update timestamp" onclick="updateTimeField()"><br/><br/>
+
+      <input type="button" value="Step 1 - VPage" onclick="StepVPage(1)"><br/>
+      <input type="button" value="Step 2 - Ajax" onclick="StepAjax(2)"><br/>
+      <input type="button" value="Step 3 - VPage" onclick="StepVPage(3)"><br/><br/>
+
+      <div id="ajaxResult">
+        <p>response of request <B>https://www.google.com/search?q=ajax</B> will go here...</p>
+      <div/>
+  </body>
+</html>
