@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Static React Page</title>
+    <script>
+      var userData = {
+        key_dtTimestamp: "123"
+      };
+      var ajaxUserData = {
+        userPageName: "Step2 - Ajax", 
+        userData: userData
+      };    
+    </script>
+
+    <script charset="UTF-8" type="text/javascript">
+      window["adrum-start-time"] = new Date().getTime();
+      (function(config){
+          (function (info) {
+              info.PageView = function(context) {
+                return userData;
+              }
+
+              info.VPageView = function(context) {
+                return userData;
+              }
+              
+              info.Ajax = function(context) {
+                return ajaxUserData;
+              }         
+          })(config.userEventInfo || (config.userEventInfo = {}));
+          
+          config.appKey = "AD-AAB-ABB-TXJ";
+          config.adrumExtUrlHttp = "http://cdn.appdynamics.com";
+          config.adrumExtUrlHttps = "https://cdn.appdynamics.com";
+          config.beaconUrlHttp = "http://pdx-col.eum-appdynamics.com";
+          config.beaconUrlHttps = "https://pdx-col.eum-appdynamics.com";
+          config.resTiming = {"bufSize":200,"clearResTimingOnBeaconSend":true};
+          config.maxUrlLength = 512;
+          config.xd = {enable : false};
+          config.spa = {
+              "spa2": true
+          };        
+      })(window["adrum-config"] || (window["adrum-config"] = {}));
+    </script>
+    <script src="http://cdn.appdynamics.com/adrum/adrum-latest.js"></script>
+
+    <script src="https://unpkg.com/react@16/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+  </head>
+  <body>
+    <div id="mydiv"></div>
+
+    <script type="text/babel">
+      class Hello extends React.Component {
+        _key = Date.now()
+        
+        setKey() {
+          this._key = Date.now();
+          userData.key_dtTimestamp = this._key;
+        }
+        
+        StepVPage( n ) {
+          ADRUM.markVirtualPageBegin("Step "+n, false);
+          alert("StepVPage ["+n+"] : "+this._key);
+          ADRUM.markVirtualPageEnd();
+        }
+
+        StepAjax( n ) {
+          alert("StepAjax ["+n+"] :" + this._key);
+          var request = new XMLHttpRequest();
+          request.open("GET", "https://www.google.com/search?q=ajax");
+          request.onreadystatechange = function() {
+            if(this.readyState === 4 && this.status === 200) {
+                document.getElementById("ajaxResult").innerHTML = this.responseText;
+            }
+          }
+          request.send();
+        }
+
+        render() {
+          return(
+            <div>
+              Timestamp: <input type="text" value={this._key} />
+              <button onClick={() => {this.setKey()} }>Update Timestamp</button><br/><br/>
+              <button onClick={() => {this.StepVPage( 1 )} }>Step 1</button><br/>
+              <button onClick={() => {this.StepAjax( 2 )} }>Step 2</button><br/>
+              <button onClick={() => {this.StepVPage( 3 )} }>Step 3</button>
+              <div id="ajaxResult">
+                <p>response of request https://www.google.com/search?q=ajax will go here...</p>
+              </div>              
+            </div>
+          );
+
+        }
+      }
+
+      ReactDOM.render(<Hello />, document.getElementById('mydiv'))
+    </script>
+  </body>
+</html>
