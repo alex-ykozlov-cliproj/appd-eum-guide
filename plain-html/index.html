@@ -50,12 +50,12 @@
     <script>
       function StepVPage( n ) {
         ADRUM.markVirtualPageBegin("Step "+n, false);
-        alert("StepVPage ["+n+"] : "+document.getElementById("dtTimestamp").value);
+        //alert("StepVPage ["+n+"] : "+document.getElementById("dtTimestamp").value);
         ADRUM.markVirtualPageEnd();
       }
 
       function StepAjax( n ) {
-        alert("StepAjax ["+n+"] : "+document.getElementById("dtTimestamp").value);
+        //alert("StepAjax ["+n+"] : "+document.getElementById("dtTimestamp").value);
         var request = new XMLHttpRequest();
         request.open("GET", "https://www.google.com/search?q=ajax");
         request.onreadystatechange = function() {

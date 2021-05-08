@@ -3,30 +3,33 @@
   <head>
     <title>Static React Page</title>
     <script>
-      var userData = {
-        key_dtTimestamp: "123"
-      };
-      var ajaxUserData = {
-        userPageName: "Step2 - Ajax", 
-        userData: userData
-      };    
+      var ajaxName = "Uninitialized";
+      
+      function extractPageUserData() {
+          return {
+            userData: {
+              key_dtTimestamp: document.getElementById("dtTimestamp").value
+            }
+          };
+      }        
+      function extractAjaxUserData() {
+          return {
+            userPageName: ajaxName,
+            userData: {
+              key_dtTimestamp: document.getElementById("dtTimestamp").value
+            }
+          };
+      }        
     </script>
 
     <script charset="UTF-8" type="text/javascript">
       window["adrum-start-time"] = new Date().getTime();
       (function(config){
           (function (info) {
-              info.PageView = function(context) {
-                return userData;
-              }
+              info.PageView = extractPageUserData;
+              info.VPageView = extractPageUserData;              
+              info.Ajax = extractAjaxUserData;
 
-              info.VPageView = function(context) {
-                return userData;
-              }
-              
-              info.Ajax = function(context) {
-                return ajaxUserData;
-              }         
           })(config.userEventInfo || (config.userEventInfo = {}));
           
           config.appKey = "AD-AAB-ABB-TXJ";
@@ -53,23 +56,27 @@
 
     <script type="text/babel">
       class Hello extends React.Component {
-        _key = Date.now()
-        
-        setKey() {
-          this._key = Date.now();
-          userData.key_dtTimestamp = this._key;
+
+        updateTimeField() {
+          var key = new Date();
+          document.getElementById("dtTimestamp").value = key;
+          //alert( "Updated userData.key_dtTimestamp="+userData.key_dtTimestamp);        
         }
         
         StepVPage( n ) {
           ADRUM.markVirtualPageBegin("Step "+n, false);
-          alert("StepVPage ["+n+"] : "+this._key);
+          //alert("StepVPage ["+n+"] : "+this._key);
           ADRUM.markVirtualPageEnd();
         }
 
         StepAjax( n ) {
-          alert("StepAjax ["+n+"] :" + this._key);
+          //alert("StepAjax ["+n+"] :" + this._key);
+          ajaxName = "Step2 - Ajax";
+          document.getElementById("ajaxResult").innerHTML = "";
+
           var request = new XMLHttpRequest();
           request.open("GET", "https://www.google.com/search?q=ajax");
+
           request.onreadystatechange = function() {
             if(this.readyState === 4 && this.status === 200) {
                 document.getElementById("ajaxResult").innerHTML = this.responseText;
@@ -81,11 +88,11 @@
         render() {
           return(
             <div>
-              Timestamp: <input type="text" value={this._key} />
-              <button onClick={() => {this.setKey()} }>Update Timestamp</button><br/><br/>
+              Timestamp: <input type="datetime-local" id="dtTimestamp"/>
+              <button onClick={() => {this.updateTimeField()} }>Update Timestamp</button><br/><br/>
               <button onClick={() => {this.StepVPage( 1 )} }>Step 1</button><br/>
               <button onClick={() => {this.StepAjax( 2 )} }>Step 2</button><br/>
-              <button onClick={() => {this.StepVPage( 3 )} }>Step 3</button>
+              <button onClick={() => {this.StepVPage( 3 )} }>Step 3</button><br/><br/>
               <div id="ajaxResult">
                 <p>response of request https://www.google.com/search?q=ajax will go here...</p>
               </div>              
